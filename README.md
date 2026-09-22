@@ -50,11 +50,32 @@ Build and test the application:
 ./mvnw test
 ```
 
-Run in Quarkus development mode:
+### Start Quarkus with the Game of Thrones router
+
+Start RabbitMQ first, then enable the Game of Thrones route in
+`src/main/resources/application.properties`:
+
+```properties
+app.route.gameofthrones.enabled=true
+```
+
+Leave the other route flags set to `false` if you only want to run this router.
+Then start Quarkus in development mode:
 
 ```bash
 ./mvnw quarkus:dev
 ```
+
+Alternatively, enable the route for one session without editing the file:
+
+```bash
+APP_ROUTE_GAMEOFTHRONES_ENABLED=true ./mvnw quarkus:dev
+```
+
+After startup, `GameOfThronesRouter` sends seven character messages to the
+`got-exchange` RabbitMQ exchange and consumes them from `character-queue`.
+The route runs once after a two-second delay. Watch the Quarkus logs for
+`Sent character to RabbitMQ` and `Received character from RabbitMQ` messages.
 
 For a native executable, build with:
 
