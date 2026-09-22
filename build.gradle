@@ -1,0 +1,51 @@
+plugins {
+    id "java"
+    id "io.quarkus" version "3.8.6"
+}
+
+group = "co.com.fduenasc"
+version = "1.0.0-SNAPSHOT"
+
+repositories {
+    maven {
+        name = "redhat"
+        url = uri("https://maven.repository.redhat.com/ga")
+    }
+    mavenCentral()
+}
+
+ext {
+    quarkusPlatformGroupId = "com.redhat.quarkus.platform"
+    quarkusPlatformVersion = "3.8.6.SP3-redhat-00002"
+}
+
+dependencies {
+    implementation enforcedPlatform("${quarkusPlatformGroupId}:quarkus-bom:${quarkusPlatformVersion}")
+    implementation enforcedPlatform("${quarkusPlatformGroupId}:quarkus-camel-bom:${quarkusPlatformVersion}")
+
+    implementation "io.quarkus:quarkus-resteasy-reactive"
+    implementation "org.apache.camel.quarkus:camel-quarkus-core"
+    implementation "org.apache.camel.quarkus:camel-quarkus-timer"
+    implementation "org.apache.camel.quarkus:camel-quarkus-direct"
+    implementation "org.apache.camel.quarkus:camel-quarkus-log"
+    implementation "org.apache.camel.quarkus:camel-quarkus-http"
+    implementation "org.apache.camel.quarkus:camel-quarkus-spring-rabbitmq"
+    implementation "org.apache.camel.quarkus:camel-quarkus-jackson"
+    implementation "org.apache.camel.quarkus:camel-quarkus-management"
+    implementation "io.hawt:hawtio-quarkus:4.0.0"
+    implementation "io.quarkus:quarkus-arc"
+    implementation "io.quarkus:quarkus-elytron-security-properties-file"
+
+    testImplementation "io.quarkus:quarkus-junit5"
+    testImplementation "io.rest-assured:rest-assured"
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 21
+    options.compilerArgs += ["-parameters"]
+}
+
+tasks.withType(Test).configureEach {
+    jvmArgs "--add-opens", "java.base/java.lang=ALL-UNNAMED"
+    systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+}

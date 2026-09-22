@@ -1,0 +1,12 @@
+pluginManagement {
+    repositories {
+        maven {
+            name = "redhat"
+            url = uri("https://maven.repository.redhat.com/ga")
+        }
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "ms-apache-camel-training"

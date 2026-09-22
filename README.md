@@ -7,7 +7,8 @@ service and runs locally in Podman.
 ## Prerequisites
 
 - Java 21 or higher
-- Maven 3.8+ (or use the included Maven wrapper)
+- JDK 21
+- Gradle (or use the included Gradle wrapper)
 - Podman
 
 ## Run RabbitMQ with Podman
@@ -46,8 +47,8 @@ podman logs rabbitmq-got
 Build and test the application:
 
 ```bash
-./mvnw package
-./mvnw test
+./gradlew build
+./gradlew test
 ```
 
 ### Start Quarkus with the Game of Thrones router
@@ -63,13 +64,13 @@ Leave the other route flags set to `false` if you only want to run this router.
 Then start Quarkus in development mode:
 
 ```bash
-./mvnw quarkus:dev
+./gradlew quarkusDev
 ```
 
 Alternatively, enable the route for one session without editing the file:
 
 ```bash
-APP_ROUTE_GAMEOFTHRONES_ENABLED=true ./mvnw quarkus:dev
+APP_ROUTE_GAMEOFTHRONES_ENABLED=true ./gradlew quarkusDev
 ```
 
 After startup, `GameOfThronesRouter` sends seven character messages to the
@@ -80,13 +81,13 @@ The route runs once after a two-second delay. Watch the Quarkus logs for
 For a native executable, build with:
 
 ```bash
-./mvnw package -Dnative
+./gradlew build -Dquarkus.native.enabled=true
 ```
 
-Then run the generated executable from `target/`:
+Then run the generated executable from `build/`:
 
 ```bash
-./target/ms-apache-camel-training-1.0.0-SNAPSHOT-runner
+./build/ms-apache-camel-training-1.0.0-SNAPSHOT-runner
 ```
 
 The default RabbitMQ connection is:
@@ -126,7 +127,7 @@ application with the Game of Thrones route enabled:
 
 ```bash
 podman start rabbitmq-got
-APP_ROUTE_GAMEOFTHRONES_ENABLED=true ./mvnw quarkus:dev
+APP_ROUTE_GAMEOFTHRONES_ENABLED=true ./gradlew quarkusDev
 ```
 
 Open the Hawtio console at:
@@ -189,7 +190,8 @@ application logs do not report a connection error.
 
 ### Missing Camel endpoint
 
-Confirm that the required Camel Quarkus extension is present in `pom.xml`.
+Confirm that the required Camel Quarkus extension is present in
+`build.gradle`.
 
 ## Learning resources
 
