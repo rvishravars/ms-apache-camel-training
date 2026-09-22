@@ -119,6 +119,35 @@ app.route.gameofthrones.enabled=true
 The `GameOfThronesRouter` publishes JSON character messages to the RabbitMQ
 exchange `got-exchange`, which is bound to the `character-queue` queue.
 
+## Monitor routes with Hawtio
+
+Hawtio is integrated for local Camel route monitoring through JMX. Start the
+application with the Game of Thrones route enabled:
+
+```bash
+podman start rabbitmq-got
+APP_ROUTE_GAMEOFTHRONES_ENABLED=true ./mvnw quarkus:dev
+```
+
+Open the Hawtio console at:
+
+http://localhost:8080/hawtio
+
+Sign in with the local development credentials:
+
+- Username: `hawtio`
+- Password: `hawtio`
+
+Select the local JMX connection, then open the Camel plugin to inspect route
+status, processors, exchanges, message counts, failures, and execution timing.
+The Game of Thrones route is named `route1` for publishing and `route2` for
+consuming. Because the publishing timer runs once after a two-second delay,
+start Hawtio promptly after launching Quarkus to observe the execution.
+
+Hawtio uses an embedded development user by default. Change these credentials
+before sharing the application or exposing the endpoint outside the local
+machine.
+
 ## Included exercises
 
 - `Exercise1Router` - Timer component
