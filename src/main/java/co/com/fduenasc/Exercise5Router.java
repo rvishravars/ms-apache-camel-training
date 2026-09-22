@@ -2,6 +2,7 @@ package co.com.fduenasc;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.builder.RouteBuilder;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 /**
  * Exercise5Router is a class that configures an Apache Camel route
@@ -11,6 +12,9 @@ import org.apache.camel.builder.RouteBuilder;
 public class Exercise5Router extends RouteBuilder {
 
     private static final String DIRECT_DYNAMIC_API_ENDPOINT = "direct:dynamic-api";
+
+    @ConfigProperty(name = "app.route.exercise5.enabled", defaultValue = "false")
+    boolean enabled;
     
     // API endpoints (using mock APIs for demonstration)
     private static final String API_A_URL = "https://httpbin.org/post"; // Mock API for user
@@ -28,6 +32,7 @@ public class Exercise5Router extends RouteBuilder {
         // Route that reads from direct:dynamic-api endpoint and routes messages
         // to different REST APIs based on user type using dynamic toD
         from(DIRECT_DYNAMIC_API_ENDPOINT)
+                .autoStartup(enabled)
                 .choice()
                     // If user type is "user", call API A
                     .when(simple("${body} contains 'user'"))
@@ -53,16 +58,19 @@ public class Exercise5Router extends RouteBuilder {
         
         // Test route that sends sample messages with different user types
         from("timer:test-dynamic-api-user?repeatCount=1&delay=2000")
+                .autoStartup(enabled)
                 .setBody(constant("user:john.doe@example.com"))
                 .to(DIRECT_DYNAMIC_API_ENDPOINT)
                 .routeId("exercise5-test-route-user");
         
         from("timer:test-dynamic-api-admin?repeatCount=1&delay=3000")
+                .autoStartup(enabled)
                 .setBody(constant("admin:admin@example.com"))
                 .to(DIRECT_DYNAMIC_API_ENDPOINT)
                 .routeId("exercise5-test-route-admin");
         
         from("timer:test-dynamic-api-error?repeatCount=1&delay=4000")
+                .autoStartup(enabled)
                 .setBody(constant("guest:guest@example.com"))
                 .to(DIRECT_DYNAMIC_API_ENDPOINT)
                 .routeId("exercise5-test-route-error");

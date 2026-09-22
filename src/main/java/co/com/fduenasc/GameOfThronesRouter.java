@@ -3,6 +3,7 @@ package co.com.fduenasc;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.dataformat.JsonLibrary;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 import java.util.HashMap;
@@ -16,6 +17,9 @@ import java.util.Map;
 public class GameOfThronesRouter extends RouteBuilder {
 
     private static final Logger LOGGER = Logger.getLogger(GameOfThronesRouter.class);
+
+    @ConfigProperty(name = "app.route.gameofthrones.enabled", defaultValue = "false")
+    boolean enabled;
 
     // Constants for JSON field names
     private static final String FIELD_NAME = "name";
@@ -33,6 +37,7 @@ public class GameOfThronesRouter extends RouteBuilder {
         // Route that sends 7 JSON messages to RabbitMQ with Game of Thrones characters
         // The ConnectionFactory bean will be automatically detected by the spring-rabbitmq component
         from("timer:got-characters?repeatCount=1&delay=2000")
+                .autoStartup(enabled)
                 .process(exchange -> {
                     // Create the 7 characters from different houses
                     Map<String, Object>[] characters = createGameOfThronesCharacters();
@@ -41,9 +46,15 @@ public class GameOfThronesRouter extends RouteBuilder {
                 })
                 .split(body())
                     .marshal().json(JsonLibrary.Jackson)
-                    .to("spring-rabbitmq:got-exchange?routingKey=character")
+                    .to("spring-rabbitmq:got-exchange?exchangeType=topic&routingKey=character")
                     .log("Sent character to RabbitMQ: ${body}")
                 .end();
+
+        // Consume character messages from RabbitMQ and log them to the application console.
+        from("spring-rabbitmq:got-exchange?exchangeType=topic&queues=character-queue&routingKey=character&autoDeclare=true&arg.queue.durable=true")
+                .autoStartup(enabled)
+                .log("Received character from RabbitMQ: ${body}")
+                .delay(1000);
     }
 
     /**
@@ -120,4 +131,3 @@ public class GameOfThronesRouter extends RouteBuilder {
         return characters;
     }
 }
-
