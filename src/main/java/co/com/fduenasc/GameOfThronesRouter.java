@@ -61,7 +61,7 @@ public class GameOfThronesRouter extends RouteBuilder {
      * Creates an array of 7 Game of Thrones characters from different houses.
      * @return Array of character maps
      */
-    private Map<String, Object>[] createGameOfThronesCharacters() {
+    Map<String, Object>[] createGameOfThronesCharacters() {
         @SuppressWarnings("unchecked")
         Map<String, Object>[] characters = new Map[7];
 
